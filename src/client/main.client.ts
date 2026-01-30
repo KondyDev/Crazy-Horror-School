@@ -1,3 +1,4 @@
-import { makeHello } from "shared/module";
+import { StarterGui } from "@rbxts/services";
 
-print(makeHello("main.client.ts"));
+// wyłącza liste graczy robloxową (TAB dziala do RitualPanel teraz)
+StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false);
