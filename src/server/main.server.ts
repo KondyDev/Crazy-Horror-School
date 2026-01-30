@@ -1,3 +1,3 @@
-import { makeHello } from "shared/module";
+import RitualManager from "./ritual/RitualManager";
 
-print(makeHello("main.server.ts"));
+const ritualManager = new RitualManager();
