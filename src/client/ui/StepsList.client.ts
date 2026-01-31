@@ -1,10 +1,11 @@
 import { getRitualPanel } from "client/utils/getRitualPanel";
-import { RitualCreated } from "shared/events/RitualEvents";
-import { StepType } from "shared/types/StepType";
+import { RitualCreated, StepCompleted } from "shared/events/RitualEvents";
+import { Step, StepType } from "shared/types/StepType";
 
 const panel = getRitualPanel();
 
 const stepsList = panel.WaitForChild("StepsList") as Frame;
+const stepLabels = new Map<string, TextLabel>();
 
 function clearSteps() {
 	for (const child of stepsList.GetChildren()) {
@@ -12,8 +13,9 @@ function clearSteps() {
 	}
 }
 
-function renderSteps(steps: StepType[]) {
+function renderSteps(steps: Step[]) {
 	clearSteps();
+	stepLabels.clear();
 
 	for (const step of steps) {
 		const label = new Instance("TextLabel");
@@ -34,6 +36,10 @@ function renderSteps(steps: StepType[]) {
 
 		label.Text = humanizeStep(step);
 		label.Parent = stepsList;
+
+		stepLabels.set(step.id, label);
+
+		if (step.completed) markStepDone(label);
 	}
 }
 
@@ -55,8 +61,8 @@ function drawLineThrough(label: TextLabel) {
 	line.Parent = label;
 }
 
-function humanizeStep(step: StepType): string {
-	const value = StepType[step];
+function humanizeStep(step: Step): string {
+	const value = StepType[step.type];
 
 	return value
 		.lower()
@@ -64,6 +70,16 @@ function humanizeStep(step: StepType): string {
 		.gsub("^%l", (c) => c.upper())[0];
 }
 
-RitualCreated.OnClientEvent.Connect((steps: StepType[]) => {
+RitualCreated.OnClientEvent.Connect((steps: Step[]) => {
 	renderSteps(steps);
+});
+
+StepCompleted.OnClientEvent.Connect((stepId: string) => {
+	const label = stepLabels.get(stepId);
+	if (!label) {
+		warn("CLIENT: no label for ", stepId);
+		return;
+	}
+
+	markStepDone(label);
 });

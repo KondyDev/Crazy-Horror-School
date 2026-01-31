@@ -1,6 +1,7 @@
-import { StepType } from "shared/types/StepType";
+import { Step, StepType } from "shared/types/StepType";
 import Ritual from "./Ritual";
 import { ConsequenceType } from "shared/types/ConsequenceType";
+import { HttpService } from "@rbxts/services";
 
 export default class RitualManager {
 	private maxSteps: number = 1;
@@ -26,8 +27,21 @@ export default class RitualManager {
 		return result;
 	}
 
-	private rollSteps(): StepType[] {
-		return this.rollFromPool(this.possibleSteps, this.maxSteps);
+	private rollSteps(): Step[] {
+		const count = math.random(1, this.maxSteps);
+		const steps: Step[] = [];
+
+		for (let i = 0; i < count; i++) {
+			const stepType = this.possibleSteps[math.random(0, this.possibleSteps.size() - 1)];
+
+			steps.push({
+				id: HttpService.GenerateGUID(false),
+				type: stepType,
+				completed: false,
+			});
+		}
+
+		return steps;
 	}
 
 	private rollConsequences(): ConsequenceType[] {

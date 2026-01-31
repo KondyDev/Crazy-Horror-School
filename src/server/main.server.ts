@@ -5,4 +5,4 @@ const ritualManager = new RitualManager();
 const ritual = ritualManager.createRandomRitual();
 
 task.wait(5);
-RitualCreated.FireAllClients(ritual.steps);
+RitualCreated.FireAllClients(ritual.getSteps());
